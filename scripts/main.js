@@ -112,7 +112,7 @@
         
         // Materials
         table_material = Physijs.createMaterial(
-            new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture( 'images/woodFloor.jpg' )}),
+            new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture( 'images/woodfloor.jpg' )}),
             .9, // high friction
             .2 // low restitution
         );
@@ -121,7 +121,7 @@
         table_material.map.repeat.set( 1, 1 );
         
         block_material = Physijs.createMaterial(
-            new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture( 'images/woodBlock.jpg' )})
+            new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture( 'images/woodblock.jpg' )})
         );
         block_material.map.wrapS = block_material.map.wrapT = THREE.RepeatWrapping;
         block_material.map.repeat.set( 1, .5 );
