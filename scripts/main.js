@@ -1,23 +1,4 @@
-<!DOCTYPE html>
 
-<html>
-
-<head>
-    <title>Jenga - Physijs</title>
-    
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
-    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.css" />
-    
-    <script type="text/javascript" src="libs/jquery-1.11.3.js"></script>
-    <script type="text/javascript" src="libs/bootstrap.js"></script>
-    <script type="text/javascript" src="libs/three.min.js"></script>
-    <script type="text/javascript" src="libs/stats.min.js"></script>
-    <script type="text/javascript" src="libs/physi.js"></script>
-    <script type="text/javascript" src="libs/TrackballControls.js"></script>
-    <script type="text/javascript" src="libs/threex.keyboardstate.js"></script>
-
-    <script type="text/javascript">
-    
     'use strict';
     
     Physijs.scripts.worker = 'libs/physijs_worker.js';
@@ -28,11 +9,15 @@
         table, blocks = [], table_material, block_material, intersect_plane,
         selected_block = null, mouse_position = new THREE.Vector3, block_offset = new THREE.Vector3, _i, _v3 = new THREE.Vector3;
 
-    var controls, keyboard, radius = 25, clock, xrotation = 0, yposition = 20, clockReset = 0, myWorker, skyboxMesh, ai = true, curMaxHeight, curRotOrder, curState = 'play';
+    var controls, keyboard, radius = 25, clock, xrotation = 0, yposition = 20, clockReset = 0, myWorker, skyboxMesh, ai = true, curMaxHeight, curRotOrder, curState = 'play', gameoverSound, blockFallSound;
     
     initScene = function() {
 
+        initSounds();
         triggerModal();
+
+        $('#play').hide();
+
 
         keyboard = new THREEx.KeyboardState();
         
@@ -153,7 +138,7 @@
         table.receiveShadow = true;
         scene.add( table );
         
-        createTower();
+        //createTower();
         GenerateSkybox();
 
         myWorker = new Worker("scripts/myWorker.js");
@@ -182,9 +167,28 @@
         removeObjects();
     };
 
+    function startGame(aiBool) {
+        ai = aiBool;
+        $("#gameover").text(" ");
+        createTower();
+        myWorker.postMessage(['reset']);
+    }
+
     function triggerModal() {
         $("#myModal").modal()//{keyboard:false, show:true});
     }
+
+    function muteSound() {
+        $("#mute").hide();
+        $("#play").show();
+        $(".audio-player")[0].pause();
+    }
+
+    function playSound() {
+        $("#mute").show();
+        $("#play").hide();
+        $(".audio-player")[0].play();
+    }   
 
     function aiturn() {
         if(curState == 'play'){
@@ -206,6 +210,7 @@
                 if(blocks[i].position.y < 3) {
                     if(curState == 'play'){
                         scene.remove(blocks[i]);
+                        blockFallSound.play();
                         blocks.splice(i, 1);
 
                         //Game Over check
@@ -221,6 +226,11 @@
                 }
             }
         }
+    }
+
+    function initSounds() {
+        gameoverSound = new Audio("sounds/gameover.mp3");
+        blockFallSound = new Audio("sounds/blockFall.mp3");
     }
 
     //[CUR_PLAYER, SCORE['',P1,P2], ADDLAYERBOOLEAN, GAMEOVERBOOLEAN]
@@ -239,6 +249,8 @@
             $("#gameover").text("GAME OVER");
             $("#curplayer").text("Player " + e.data[0] + " Wins!");
             curState = 'gameover';
+            $("#gameOverModal").modal();
+            gameoverSound.play();
         }
     }
 
@@ -292,15 +304,22 @@
         camera.lookAt( new THREE.Vector3( 0,7,0 ));
 
     }
+
+    function removeBlocks() {
+        for(var i = 0; i < blocks.length; i++) {
+            scene.remove(blocks[i]);
+        }
+    }
     
     createTower = (function() {
-        curState = 'play';
-       
-        blocks = [];
-        var block_length = 6, block_height = 1, block_width = 1.5, block_offset = 2,
-            block_geometry = new THREE.BoxGeometry( block_length, block_height, block_width );
         
         return function() {
+            curState = 'play';
+            removeBlocks();
+            blocks = [];
+            var block_length = 6, block_height = 1, block_width = 1.5, block_offset = 2,
+                block_geometry = new THREE.BoxGeometry( block_length, block_height, block_width );
+        
             var i, j, rows = 20,
                 block;
             curMaxHeight = rows;
@@ -428,37 +447,3 @@
     
     window.onload = initScene;
     
-    </script>
-</head>
-
-<body style="margin: 0px; padding: 0px;">
-    <div id="viewport"></div>
-    <div id="p1score" style="position:absolute; top: 10px; left:10px; color:white;"></div>
-    <div id="curplayer" style="position:absolute; top: 10px; left: 45%; color:white;"></div>
-    <div id="p2score" style="position:absolute; top: 10px; right:10px; color:white;"></div>
-    <div id="gameover" style="position:absolute; bottom: 5%; left: 45%; color:red;"></div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="myModal" style="background: rgba(0, 0, 0, 0.5);" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-      <div class="modal-dialog" style="background: rgba(0, 0, 0, 0.5);" role="document">
-        <div class="modal-content" style="background: rgba(0, 0, 0, 0.5);">
-          <div class="modal-header" style="background: rgba(0, 0, 0, 0.5);">
-            <button type="button" class="close" style="background: rgba(0, 0, 0, 0.5);" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Jenga</h4>
-          </div>
-          <div style="color:white" class="modal-body">
-            <p> Welcome to Jenga v1.0 </p>
-            <p> You can either play against the computer or against another human player by choosing your mode below. </p>
-            <p> Click and hold down the mouse on a block to select it, and then you may move the block in the XZ plane to try and score.</p>
-            <p> The game ends when somebody knocks more than one block off the tower during their turn. </p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" style="left: 10%; right: 80%;" onclick="ai=true" class="btn btn-default" data-dismiss="modal">Computer</button>
-            <button type="button" style="right: 10%; left: 80%;" onclick="ai=false" class="btn btn-default" data-dismiss="modal">Two Player</button>
-          </div>
-        </div>
-      </div>
-    </div>
-</body>
-
-</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Jenga - Physijs</title>
+    
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.css" />
+    
+    <script type="text/javascript" src="libs/jquery-1.11.3.js"></script>
+    <script type="text/javascript" src="libs/bootstrap.js"></script>
+    <script type="text/javascript" src="libs/three.min.js"></script>
+    <script type="text/javascript" src="libs/stats.min.js"></script>
+    <script type="text/javascript" src="libs/physi.js"></script>
+    <script type="text/javascript" src="libs/TrackballControls.js"></script>
+    <script type="text/javascript" src="libs/threex.keyboardstate.js"></script>
+
+    <script type="text/javascript" src="scripts/main.js"></script>
+</head>
+
+<body style="margin: 0px; padding: 0px;">
+    <div id="viewport"></div>
+    <div id="p1score" style="position:absolute; top: 10px; left:10px; color:white; font-size:200%;"></div>
+    <div id="curplayer" style="position:absolute; top: 10px; left: 45%; color:white; font-size:200%;"></div>
+    <div id="p2score" style="position:absolute; top: 10px; right:10px; color:white; font-size:200%;"></div>
+    <div id="gameover" style="position:absolute; bottom: 5%; left: 45%; color:red; font-size:200%;"></div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" style="background: rgba(0, 0, 0, 0.5);" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" style="background: rgba(0, 0, 0, 0.5);" role="document">
+        <div class="modal-content" style="background: rgba(0, 0, 0, 0.5);">
+          <div class="modal-header" style="background: rgba(0, 0, 0, 0.5);">
+            <button type="button" class="close" style="background: rgba(0, 0, 0, 0.5);" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Jenga</h4>
+          </div>
+          <div style="color:white" class="modal-body">
+            <p> Welcome to Jenga v1.0 </p>
+            <p> You can either play against the computer or against another human player by choosing your mode below. </p>
+            <p> Click and hold down the mouse on a block to select it, and then you may move the block in the XZ plane to try and score.</p>
+            <p> The game ends when somebody knocks more than one block off the tower during their turn. </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" style="left: 10%; right: 80%;" onclick="startGame(true)" class="btn btn-default" data-dismiss="modal">Computer</button>
+            <button type="button" style="right: 10%; left: 80%;" onclick="startGame(false)" class="btn btn-default" data-dismiss="modal">Two Player</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+     <!-- Game Over Modal -->
+    <div class="modal fade" id="gameOverModal" style="background: rgba(0, 0, 0, 0.5);" tabindex="-1" role="dialog" aria-labelledby="gameOverModalLabel">
+      <div class="modal-dialog" style="background: rgba(0, 0, 0, 0.5);" role="document">
+        <div class="modal-content" style="background: rgba(0, 0, 0, 0.5);">
+          <div class="modal-header" style="background: rgba(0, 0, 0, 0.5);">
+            <button type="button" class="close" style="background: rgba(0, 0, 0, 0.5);" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="gameOverModalLabel">Jenga</h4>
+          </div>
+          <div style="color:white" class="modal-body">
+            <p> Game Over </p>
+            <p> Play Again? </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" style="left: 10%; right: 80%;" onclick="startGame(true)" class="btn btn-default" data-dismiss="modal">Computer</button>
+            <button type="button" style="right: 10%; left: 80%;" onclick="startGame(false)" class="btn btn-default" data-dismiss="modal">Two Player</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <audio class="audio-player" autoplay loop>
+        <source src="sounds/bgm.mp3">
+    </audio>
+
+    <div style="position:absolute; bottom:2%; left: 1%; font-size: 250%;" >
+        <div id="mute">
+            <a href="javascript:void(0)" id="mute" class="color:white" onclick="muteSound()"><span class="glyphicon glyphicon-volume-off"></span></a>
+        </div>
+        <div id="play">
+            <a href="javascript:void(0)" id="play" class="color:white" onclick="playSound()"><span class="glyphicon glyphicon-volume-up"></span></a>
+        </div>
+    </div>
+
+</body>
+
+</html>
